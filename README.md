@@ -1,1 +1,1 @@
-# projinda26_projekt_namn
+# projinda26_speedtyping
