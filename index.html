@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Typing Input Test</title>
+    <title>Typing Input WPM Test</title>
   </head>
   <body>
-    <h1>Typing Input Test</h1>
+    <h1>Typing Input WPM Test</h1>
 
-    <p>Click here and start typing...</p>
+    <p id="target-text">hello world</p>
 
-    <input id="typing-input" type="text" />
+    <p>Current position: <span id="current-position">0</span></p>
+    <p>Status: <span id="status">Waiting for first key...</span></p>
+    <p>WPM: <span id="wpm">0</span></p>
+    <p>Accuracy: <span id="accuracy">100</span>%</p>
 
     <script src="input.js"></script>
   </body>
