@@ -4,6 +4,8 @@ const cors = require('cors');
 require('dotenv').config();
 
 const connectDB = require('./db'); // imports the connectDB function from db.js to establish a database connection
+const contentRoutes = require('./routes/content');
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -13,6 +15,9 @@ connectDB(); // Calls the function to connect to the database when the server st
 // Middleware
 app.use(cors()); // Allows frontend to access backend resources (the server) without getting blocked
 app.use(express.json()); // Tells Express to automatically parse incoming JSON data in request bodies
+
+// Routes
+app.use('/content', contentRoutes);
 
 // Test Route
 app.get('/', (req, res) => { // Defines a route: when someone visits the root URL ("/"), send back this JSON response
