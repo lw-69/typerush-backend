@@ -3,8 +3,12 @@ const express = require('express'); // imports Express library
 const cors = require('cors');
 require('dotenv').config();
 
+const connectDB = require('./db'); // imports the connectDB function from db.js to establish a database connection
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// Connect to Database
+connectDB(); // Calls the function to connect to the database when the server starts
 
 // Middleware
 app.use(cors()); // Allows frontend to access backend resources (the server) without getting blocked
