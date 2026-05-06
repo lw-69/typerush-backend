@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <!-- This makes the page scale properly on phones, tablets, and computers. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TypeRush</title>
+
+  <!-- Link to CSS file -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- =========================
+       Main menu screen
+  ========================== -->
+  <section id="menu-screen">
+    <h1>TypeRush</h1>
+    <p>A typing speed and accuracy game</p>
+
+    <!-- Mode selector -->
+    <h2>Choose Mode</h2>
+    <!-- This creates a dropdown where the player chooses the game mode and the value is what JavaScript will read later. -->
+    <select id="mode-select">
+      <option value="words">Words</option>
+      <option value="sentences">Sentences</option>
+      <option value="code">Code</option>
+    </select>
+
+    <!-- Difficulty selector -->
+    <h2>Choose Difficulty</h2>
+    <select id="difficulty-select">
+      <option value="easy">Easy</option>
+      <option value="medium">Medium</option>
+      <option value="hard">Hard</option>
+    </select>
+
+    <!-- Start button -->
+    <button id="start-btn">Start Game</button>
+  </section>
+
+  <!-- =========================
+       Game screen
+  ========================== -->
+  <section id="game-screen" class="hidden">
+    <h1>TypeRush</h1>
+
+    <!-- Game stats (will be updated later) -->
+    <!-- Each span has an id, so JavaScript can change the text later. -->
+    <div>
+      <p>WPM: <span id="wpm">0</span></p>
+      <p>Accuracy: <span id="accuracy">100%</span></p>
+      <p>Lives: <span id="lives">❤️❤️❤️</span></p>
+      <p>Streak: <span id="streak">1x</span></p>
+      <p>Timer: <span id="timer">60</span>s</p>
+    </div>
+
+    <!-- Text player will type -->
+    <!-- It’s used because it includes every letter, so it’s perfect for testing typing. -->
+    <!-- Right now, it’s just a placeholder! -->
+    <div id="text-display">
+      The quick brown fox jumps over the lazy dog.
+    </div>
+
+    <!-- Input field -->
+    <!-- The placeholder is just the grey text shown before the user types. -->
+    <input id="typing-input" type="text" placeholder="Start typing here..." />
+
+    <!-- Temporary button to simulate end of game -->
+    <!-- This is a temporary button to test the results screen before the full timer/game logic is done. -->
+    <button id="finish-btn">Finish Session</button>
+  </section>
+
+  <!-- =========================
+       Results screen
+  ========================== -->
+  <!-- This screen is hidden at first and will show after the game ends. -->
+  <section id="results-screen" class="hidden">
+    <h1>Results</h1>
+
+    <!-- Results (will be updated later) -->
+    <p>Final WPM: <span id="final-wpm">0</span></p>
+    <p>Accuracy: <span id="final-accuracy">100%</span></p>
+    <p>Score: <span id="final-score">0</span></p>
+    <p>Personal Best: <span id="personal-best">0</span></p>
+
+    <!-- Navigation buttons -->
+    <button id="play-again-btn">Play Again</button>
+    <button id="back-menu-btn">Back to Menu</button>
+  </section>
+
+  <!-- Link to JavaScript -->
+  <!-- This connects the HTML to the JavaScript file. It is placed at the bottom so the HTML loads first, then JavaScript can find all the elements. -->
+  <script src="script.js"></script>
+</body>
+</html>
