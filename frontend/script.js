@@ -16,7 +16,7 @@ function showScreen(screen) {
   gameScreen.classList.add("hidden");
   resultsScreen.classList.add("hidden");
 
-  // Show selected screen, so that the one you choose becomes visible.
+  // Shows selected screen, so that the one you choose becomes visible.
   screen.classList.remove("hidden");
 }
 
