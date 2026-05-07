@@ -1,0 +1,35 @@
+
+{
+  "code": [
+    "const express = require('express');",
+    "app.listen(3000, () => console.log('Server running'));",
+    "const data = await fetch('/api/session');",
+    "mongoose.connect(process.env.MONGO_URI);",
+    "module.exports = connectDB;",
+    "const router = express.Router();",
+    "app.use(express.json());",
+    "res.status(200).json({ message: 'OK' });",
+    "const PORT = process.env.PORT || 3000;",
+    "require('dotenv').config();",
+    "const { Schema } = require('mongoose');",
+    "await Session.findOne().sort({ wpm: -1 });",
+    "const history = await Session.find().limit(10);",
+    "app.use(cors());",
+    "res.status(404).json({ error: 'Not found' });",
+    "const path = require('path');",
+    "const fs = require('fs');",
+    "JSON.parse(fs.readFileSync('./data.json', 'utf8'));",
+    "const shuffled = array.sort(() => Math.random() - 0.5);",
+    "return shuffled.slice(0, count);",
+    "app.get('/content/:mode', async (req, res) => {});",
+    "const mode = req.params.mode;",
+    "if (!validModes.includes(mode)) return res.status(400);",
+    "const session = new Session({ wpm, accuracy, score });",
+    "await session.save();",
+    "process.exit(1);",
+    "console.error('Connection failed:', error.message);",
+    "const best = await Session.findOne().sort({ wpm: -1 });",
+    "res.status(201).json(savedSession);",
+    "const validModes = ['words', 'sentences', 'code'];"
+  ]
+}
