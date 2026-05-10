@@ -1,12 +1,22 @@
 const targetText = "hello world"; //The text that is supposed to be written by the user
 const INITIAL_LIVES = 3;
 const ERROR_THRESHOLD = 3;
+const WORD_BASE_POINTS = 10;
+const MULTIPLIER_THRESHOLDS = [
+  { minStreak: 25, multiplier: 3 },
+  { minStreak: 10, multiplier: 2 },
+  { minStreak: 0, multiplier: 1 },
+];
 let currentPosition = 0;
 let startTime = null;
 let wpmTimerId = null;
 let lives = INITIAL_LIVES;
 let errorsSinceLastLifeLoss = 0;
 let sessionEnded = false;
+let consecutiveCorrectWords = 0;
+let multiplier = 1;
+let score = 0;
+let currentWordHasError = false;
 
 const typedCharacters = []; //An array of all the typed characters
 
@@ -17,6 +27,7 @@ const statusElement = document.getElementById("status");
 const wpmElement = document.getElementById("wpm");
 const accuracyElement = document.getElementById("accuracy");
 const livesElement = document.getElementById("lives");
+const multiplierElement = document.getElementById("multiplier");
 
 targetTextElement.textContent = targetText; //The text that will be displayed on the browser
 
@@ -48,6 +59,16 @@ function calculateAccuracy() {
   return (correctCharacters / typedCharacters.length) * 100;
 }
 
+//Returns the multiplier value for a given streak length, based on the configured thresholds
+function multiplierForStreak(streak) {
+  for (const tier of MULTIPLIER_THRESHOLDS) {
+    if (streak >= tier.minStreak) {
+      return tier.multiplier;
+    }
+  }
+  return 1;
+}
+
 //Sets the wpm and accuracy on the browser to the correct values
 function updateStatsDisplay() {
   const wpm = calculateWpm();
@@ -59,6 +80,11 @@ function updateStatsDisplay() {
 
 function updateLivesDisplay() {
   livesElement.textContent = String(lives);
+}
+
+//Updates the multiplier display so Person B's UI can read it
+function updateMultiplierDisplay() {
+  multiplierElement.textContent = String(multiplier) + "x";
 }
 
 function startTimerIfNeeded() {
@@ -89,6 +115,9 @@ function endSession(reason) {
     accuracy: calculateAccuracy(),
     lives,
     charactersTyped: typedCharacters.length,
+    score,
+    multiplier,
+    consecutiveCorrectWords,
   };
 
   console.log("Session ended:", summary);
@@ -130,14 +159,21 @@ document.addEventListener("keydown", (event) => { //Makes the following function
     isCorrect,
   });
 
+  //Lives system: count cumulative errors, deduct a life on threshold breach
+  //Streak system: reset multiplier and streak on any error, mark current word as broken
   if (!isCorrect) {
     errorsSinceLastLifeLoss += 1;
 
-  if (errorsSinceLastLifeLoss >= ERROR_THRESHOLD) {
+    if (errorsSinceLastLifeLoss >= ERROR_THRESHOLD) {
       lives -= 1;
       errorsSinceLastLifeLoss = 0;
       console.log("Life lost. Lives remaining:", lives);
     }
+
+    //Streak resets immediately on any error
+    consecutiveCorrectWords = 0;
+    multiplier = 1;
+    currentWordHasError = true;
   }
 
   //Prints information to the console for debugging
@@ -150,14 +186,38 @@ document.addEventListener("keydown", (event) => { //Makes the following function
     accuracy: calculateAccuracy(),
     lives,
     errorsSinceLastLifeLoss,
+    consecutiveCorrectWords,
+    multiplier,
+    score,
   });
 
   currentPosition += 1;
+
+  //Word boundary check: did we just finish a word? (space in target, or end of text)
+  const isAtWordBoundary = expectedCharacter === " " || currentPosition >= targetText.length;
+  if (isAtWordBoundary) {
+    if (!currentWordHasError) {
+      consecutiveCorrectWords += 1;
+      multiplier = multiplierForStreak(consecutiveCorrectWords);
+      const pointsEarned = WORD_BASE_POINTS * multiplier;
+      score += pointsEarned;
+      console.log(
+        "Word completed correctly. Streak:", consecutiveCorrectWords,
+        "Multiplier:", multiplier + "x",
+        "Points earned:", pointsEarned,
+        "Total score:", score
+      );
+    } else {
+      console.log("Word completed with errors. Streak stays at 0.");
+    }
+    currentWordHasError = false;
+  }
 
   currentPositionElement.textContent = String(currentPosition);
   statusElement.textContent = isCorrect ? "Correct" : "Incorrect";
 
   updateLivesDisplay();
+  updateMultiplierDisplay();
   updateStatsDisplay();
 
   //End session early if lives are gone, otherwise on full text completion
@@ -172,3 +232,4 @@ document.addEventListener("keydown", (event) => { //Makes the following function
 
 updateStatsDisplay();
 updateLivesDisplay();
+updateMultiplierDisplay();
