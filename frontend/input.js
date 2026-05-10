@@ -1,7 +1,7 @@
 const targetText = "hello world"; //The text that is supposed to be written by the user
 const INITIAL_LIVES = 3;
 const ERROR_THRESHOLD = 3;
-const WORD_BASE_POINTS = 10;
+const MODE = "words";
 const MULTIPLIER_THRESHOLDS = [
   { minStreak: 25, multiplier: 3 },
   { minStreak: 10, multiplier: 2 },
@@ -15,7 +15,7 @@ let errorsSinceLastLifeLoss = 0;
 let sessionEnded = false;
 let consecutiveCorrectWords = 0;
 let multiplier = 1;
-let score = 0;
+let peakMultiplier = 1;
 let currentWordHasError = false;
 
 const typedCharacters = []; //An array of all the typed characters
@@ -57,6 +57,15 @@ function calculateAccuracy() {
   const correctCharacters = typedCharacters.filter((entry) => entry.isCorrect).length; //Filters characters by correctness
 
   return (correctCharacters / typedCharacters.length) * 100;
+}
+
+//Final score formula: WPM × accuracy% × peak multiplier reached during the session
+//Example: WPM=60, accuracy=95%, peakMultiplier=2 → score = 60 × 0.95 × 2 = 114
+function calculateFinalScore() {
+  const wpm = calculateWpm();
+  const accuracyPercent = calculateAccuracy();
+  const accuracyRatio = accuracyPercent / 100;
+  return Math.round(wpm * accuracyRatio * peakMultiplier);
 }
 
 //Returns the multiplier value for a given streak length, based on the configured thresholds
@@ -109,20 +118,31 @@ function endSession(reason) {
     wpmTimerId = null;
   }
 
-  const summary = {
-    reason, //"text complete" | "out of lives"
-    wpm: calculateWpm(),
-    accuracy: calculateAccuracy(),
+  //Build the session result object — this is what gets sent to the backend (Issue #16)
+  //and rendered on the results screen by Person B
+  const sessionResult = {
+    wpm: Math.round(calculateWpm()),
+    accuracy: Math.round(calculateAccuracy()),
+    score: calculateFinalScore(),
+    mode: MODE,
+    timestamp: new Date().toISOString(),
+  };
+
+  //Extra debug info — not part of the API contract, just useful for development
+  const debugSummary = {
+    ...sessionResult,
+    reason,
     lives,
     charactersTyped: typedCharacters.length,
-    score,
-    multiplier,
+    peakMultiplier,
+    finalMultiplier: multiplier,
     consecutiveCorrectWords,
   };
 
-  console.log("Session ended:", summary);
+  console.log("Session ended:", debugSummary);
 
-  document.dispatchEvent(new CustomEvent("sessionend", { detail: summary }));
+  //Person B (results screen) and Person C (API call) both listen for this event
+  document.dispatchEvent(new CustomEvent("sessionend", { detail: sessionResult }));
 }
 
 document.addEventListener("keydown", (event) => { //Makes the following function run every time a key is pressed
@@ -188,24 +208,22 @@ document.addEventListener("keydown", (event) => { //Makes the following function
     errorsSinceLastLifeLoss,
     consecutiveCorrectWords,
     multiplier,
-    score,
+    peakMultiplier,
   });
 
   currentPosition += 1;
 
-  //Word boundary check: did we just finish a word? (space in target, or end of text)
-  const isAtWordBoundary = expectedCharacter === " " || currentPosition >= targetText.length;
   if (isAtWordBoundary) {
     if (!currentWordHasError) {
       consecutiveCorrectWords += 1;
       multiplier = multiplierForStreak(consecutiveCorrectWords);
-      const pointsEarned = WORD_BASE_POINTS * multiplier;
-      score += pointsEarned;
+      if (multiplier > peakMultiplier) {
+        peakMultiplier = multiplier;
+      }
       console.log(
         "Word completed correctly. Streak:", consecutiveCorrectWords,
         "Multiplier:", multiplier + "x",
-        "Points earned:", pointsEarned,
-        "Total score:", score
+        "Peak multiplier:", peakMultiplier + "x"
       );
     } else {
       console.log("Word completed with errors. Streak stays at 0.");
