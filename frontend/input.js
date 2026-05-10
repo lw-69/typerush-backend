@@ -1,7 +1,12 @@
 const targetText = "hello world"; //The text that is supposed to be written by the user
+const INITIAL_LIVES = 3;
+const ERROR_THRESHOLD = 3;
 let currentPosition = 0;
 let startTime = null;
 let wpmTimerId = null;
+let lives = INITIAL_LIVES;
+let errorsSinceLastLifeLoss = 0;
+let sessionEnded = false;
 
 const typedCharacters = []; //An array of all the typed characters
 
@@ -11,6 +16,7 @@ const currentPositionElement = document.getElementById("current-position");
 const statusElement = document.getElementById("status");
 const wpmElement = document.getElementById("wpm");
 const accuracyElement = document.getElementById("accuracy");
+const livesElement = document.getElementById("lives");
 
 targetTextElement.textContent = targetText; //The text that will be displayed on the browser
 
@@ -51,6 +57,10 @@ function updateStatsDisplay() {
   accuracyElement.textContent = String(Math.round(accuracy));
 }
 
+function updateLivesDisplay() {
+  livesElement.textContent = String(lives);
+}
+
 function startTimerIfNeeded() {
   if (startTime !== null) {
     return;
@@ -62,7 +72,36 @@ function startTimerIfNeeded() {
   console.log("Session timer started:", startTime);
 }
 
+function endSession(reason) {
+  if (sessionEnded) {
+    return;
+  }
+  sessionEnded = true;
+
+  if (wpmTimerId !== null) {
+    clearInterval(wpmTimerId);
+    wpmTimerId = null;
+  }
+
+  const summary = {
+    reason, //"text complete" | "out of lives"
+    wpm: calculateWpm(),
+    accuracy: calculateAccuracy(),
+    lives,
+    charactersTyped: typedCharacters.length,
+  };
+
+  console.log("Session ended:", summary);
+
+  document.dispatchEvent(new CustomEvent("sessionend", { detail: summary }));
+}
+
 document.addEventListener("keydown", (event) => { //Makes the following function run every time a key is pressed
+  
+  //Ignore input after the session has ended
+  if (sessionEnded) {
+    return;
+  }
   
   //Ignores clicks that are Tab, Enter or a non-character key
   if (event.key === "Tab" || event.key === "Enter") {
@@ -76,7 +115,6 @@ document.addEventListener("keydown", (event) => { //Makes the following function
 
   //Stops accepting input if the user tries to write more characters than the length of the target text
   if (currentPosition >= targetText.length) {
-    console.log("Session complete");
     return;
   }
 
@@ -92,6 +130,16 @@ document.addEventListener("keydown", (event) => { //Makes the following function
     isCorrect,
   });
 
+  if (!isCorrect) {
+    errorsSinceLastLifeLoss += 1;
+
+  if (errorsSinceLastLifeLoss >= ERROR_THRESHOLD) {
+      lives -= 1;
+      errorsSinceLastLifeLoss = 0;
+      console.log("Life lost. Lives remaining:", lives);
+    }
+  }
+
   //Prints information to the console for debugging
   console.log({
     position: currentPosition,
@@ -100,6 +148,8 @@ document.addEventListener("keydown", (event) => { //Makes the following function
     isCorrect,
     wpm: calculateWpm(),
     accuracy: calculateAccuracy(),
+    lives,
+    errorsSinceLastLifeLoss,
   });
 
   currentPosition += 1;
@@ -107,14 +157,18 @@ document.addEventListener("keydown", (event) => { //Makes the following function
   currentPositionElement.textContent = String(currentPosition);
   statusElement.textContent = isCorrect ? "Correct" : "Incorrect";
 
+  updateLivesDisplay();
   updateStatsDisplay();
 
-  //Ends the session and stops the timer if the user has written the length of the target text and the timer is on
-  if (currentPosition >= targetText.length && wpmTimerId !== null) {
-    clearInterval(wpmTimerId);
-    wpmTimerId = null;
-    console.log("Session complete");
+  //End session early if lives are gone, otherwise on full text completion
+  if (lives <= 0) {
+    endSession("out of lives");
+    return;
+  }
+  if (currentPosition >= targetText.length) {
+    endSession("text complete");
   }
 });
 
 updateStatsDisplay();
+updateLivesDisplay();
