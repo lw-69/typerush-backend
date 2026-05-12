@@ -111,3 +111,25 @@ button:hover {
   gap: 20px;
   flex-wrap: wrap;
 }
+
+/* Base style for every character */
+.character {
+  padding: 2px;
+  border-radius: 4px;
+}
+
+/* Correctly typed characters become green */
+.correct {
+  color: var(--correct);
+}
+
+/* Incorrectly typed characters become red */
+.incorrect {
+  color: var(--error);
+}
+
+/* Current typing position */
+.current {
+  background-color: var(--accent);
+  color: var(--background);
+}

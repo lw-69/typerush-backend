@@ -56,11 +56,11 @@
     </div>
 
     <!-- Text player will type -->
-    <!-- It’s used because it includes every letter, so it’s perfect for testing typing. -->
-    <!-- Right now, it’s just a placeholder! -->
-    <div id="text-display">
-      The quick brown fox jumps over the lazy dog.
-    </div>
+    <div id="target-text"></div>
+
+    <!-- Debug/testing info -->
+    <p>Current position: <span id="current-position">0</span></p>
+    <p>Status: <span id="status">Waiting...</span></p>
 
     <!-- Input field -->
     <!-- The placeholder is just the grey text shown before the user types. -->
@@ -90,7 +90,10 @@
   </section>
 
   <!-- Link to JavaScript -->
-  <!-- This connects the HTML to the JavaScript file. It is placed at the bottom so the HTML loads first, then JavaScript can find all the elements. -->
+  <!-- This connects the HTML to the JavaScript files. It is placed at the bottom so the HTML loads first, then JavaScript can find all the elements. -->
+  <!-- For screen switching -->
   <script src="script.js"></script>
+  <!-- For typing logic -->
+  <script src="input.js"></script>
 </body>
 </html>

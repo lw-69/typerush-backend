@@ -29,7 +29,29 @@ const accuracyElement = document.getElementById("accuracy");
 const livesElement = document.getElementById("lives");
 const multiplierElement = document.getElementById("multiplier");
 
-targetTextElement.textContent = targetText; //The text that will be displayed on the browser
+// Clear existing text inside the target text container
+targetTextElement.innerHTML = "";
+
+// Loop through every character in the target text
+for (let i = 0; i < targetText.length; i++) {
+
+  // Create a new <span> element for each character
+  const characterSpan = document.createElement("span");
+
+  // Put the current character inside the span
+  characterSpan.textContent = targetText[i];
+
+  // Add a general class for all characters
+  characterSpan.classList.add("character");
+
+  // Highlight the very first character as the current typing position
+  if (i === 0) {
+    characterSpan.classList.add("current");
+  }
+
+  // Add the span to the page
+  targetTextElement.appendChild(characterSpan);
+}
 
 function calculateMinutesElapsed() {
   if (startTime === null) {
@@ -170,6 +192,33 @@ document.addEventListener("keydown", (event) => { //Makes the following function
   const typedCharacter = event.key;
   const expectedCharacter = targetText[currentPosition];
   const isCorrect = typedCharacter === expectedCharacter;
+
+  // Check if the current character finishes a word.
+  // A word is finished when the expected character is a space,
+  // or when the player reaches the last character in the text.
+  const isAtWordBoundary =
+    expectedCharacter === " " || currentPosition === targetText.length - 1;
+
+  // This code updates the visual feedback after the player types one character
+  // Get all character spans from the page
+  const characterSpans = document.querySelectorAll(".character");
+
+  // Remove the "current" highlight from the current character
+  characterSpans[currentPosition].classList.remove("current");
+
+  // If the typed character is correct → make it green
+  if (isCorrect) {
+    characterSpans[currentPosition].classList.add("correct");
+  } else {
+
+    // Otherwise make it red
+    characterSpans[currentPosition].classList.add("incorrect");
+  }
+
+  // Move the cursor highlight to the next character
+  if (currentPosition + 1 < characterSpans.length) {
+    characterSpans[currentPosition + 1].classList.add("current");
+  }
 
   //Creates an object describing the keypress, stores information in the typedCharacters-array
   typedCharacters.push({
