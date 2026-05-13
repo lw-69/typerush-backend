@@ -104,12 +104,42 @@ button:hover {
     max-width: 500px;
 }
 
-/* Game stats */
-#game-screen div:first-of-type {
+/* Container for the live game stats such as WPM, accuracy, lives, streak, and timer.
+   The flex layout keeps the cards in one row when there is space,
+   and wraps them on smaller screens. */
+.stats-panel {
   display: flex;
   justify-content: center;
-  gap: 20px;
+  gap: 16px;
   flex-wrap: wrap;
+  margin: 24px 0;
+}
+
+/* Individual stat box.
+   The dark background separates the stats from the main game area
+   without making them too distracting. */
+.stat-card {
+  min-width: 80px;
+  background-color: #020617;
+  border-radius: 10px;
+  padding: 8px 12px;
+  text-align: center;
+}
+
+/* Small label text above each stat value, like "WPM" or "Accuracy". */
+.stat-label {
+  display: block;
+  font-size: 12px;
+  color: var(--muted-text);
+  margin-bottom: 4px;
+}
+
+/* Main stat value, like "54", "98.5%", or "1x". */
+.stat-value {
+  display: block;
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--text);
 }
 
 /* Base style for every character */

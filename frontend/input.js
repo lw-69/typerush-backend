@@ -100,13 +100,21 @@ function multiplierForStreak(streak) {
   return 1;
 }
 
-//Sets the wpm and accuracy on the browser to the correct values
+// Updates the WPM and accuracy numbers shown on the game screen.
+// This function is called every second by setInterval,
+// and also after each keypress so the UI feels responsive.
 function updateStatsDisplay() {
+  // Calculate the current words per minute using Person A's logic
   const wpm = calculateWpm();
+
+  // Calculate the current typing accuracy using Person A's logic
   const accuracy = calculateAccuracy();
 
+  // Show WPM as a whole number, for example: 42
   wpmElement.textContent = String(Math.round(wpm));
-  accuracyElement.textContent = String(Math.round(accuracy));
+
+  // Show accuracy as a percentage with 1 decimal place, for example: 96.5%
+  accuracyElement.textContent = accuracy.toFixed(1) + "%";
 }
 
 function updateLivesDisplay() {
@@ -193,9 +201,9 @@ document.addEventListener("keydown", (event) => { //Makes the following function
   const expectedCharacter = targetText[currentPosition];
   const isCorrect = typedCharacter === expectedCharacter;
 
-  // Check if the current character finishes a word.
+  // Check if the current character finishes a word
   // A word is finished when the expected character is a space,
-  // or when the player reaches the last character in the text.
+  // or when the player reaches the last character in the text
   const isAtWordBoundary =
     expectedCharacter === " " || currentPosition === targetText.length - 1;
 
@@ -206,7 +214,7 @@ document.addEventListener("keydown", (event) => { //Makes the following function
   // Remove the "current" highlight from the current character
   characterSpans[currentPosition].classList.remove("current");
 
-  // If the typed character is correct → make it green
+  // If the typed character is correct -> make it green
   if (isCorrect) {
     characterSpans[currentPosition].classList.add("correct");
   } else {

@@ -45,15 +45,45 @@
   <section id="game-screen" class="hidden">
     <h1>TypeRush</h1>
 
-    <!-- Game stats (will be updated later) -->
-    <!-- Each span has an id, so JavaScript can change the text later. -->
-    <div>
-      <p>WPM: <span id="wpm">0</span></p>
-      <p>Accuracy: <span id="accuracy">100%</span></p>
-      <p>Lives: <span id="lives">❤️❤️❤️</span></p>
-      <p>Streak: <span id="streak">1x</span></p>
-      <p>Timer: <span id="timer">60</span>s</p>
+    <!-- Game stats shown during the typing session.
+    These values are updated by input.js while the player types. -->
+    <div class="stats-panel">
+
+    <!-- WPM = Words Per Minute.
+    JavaScript updates this number in real time. -->
+    <div class="stat-card">
+      <span class="stat-label">WPM</span>
+      <span id="wpm" class="stat-value">0</span>
     </div>
+
+    <!-- Accuracy shows how many typed characters were correct.
+    It should display as a percentage with one decimal place. -->
+    <div class="stat-card">
+      <span class="stat-label">Accuracy</span>
+      <span id="accuracy" class="stat-value">100.0%</span>
+    </div>
+
+    <!-- Lives display.
+    Person A's game logic updates this when the player makes mistakes. -->
+    <div class="stat-card">
+      <span class="stat-label">Lives</span>
+      <span id="lives" class="stat-value">❤️❤️❤️</span>
+    </div>
+
+    <!-- Streak multiplier display.
+    This increases when the player types correctly without mistakes. -->
+    <div class="stat-card">
+      <span class="stat-label">Streak</span>
+      <span id="multiplier" class="stat-value">1x</span>
+    </div>
+
+  <!-- Timer display.
+    This will be used later for timed game modes. -->
+  <div class="stat-card">
+    <span class="stat-label">Timer</span>
+    <span class="stat-value"><span id="timer">60</span>s</span>
+  </div>
+</div>
 
     <!-- Text player will type -->
     <div id="target-text"></div>
