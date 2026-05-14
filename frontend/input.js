@@ -1,16 +1,19 @@
-const targetText = "hello world"; //The text that is supposed to be written by the user
+const targetText = "hello world"; // The text that is supposed to be written by the user
 const INITIAL_LIVES = 3;
 const ERROR_THRESHOLD = 3;
 const MODE = "words";
+
 const MULTIPLIER_THRESHOLDS = [
   { minStreak: 25, multiplier: 3 },
   { minStreak: 10, multiplier: 2 },
   { minStreak: 0, multiplier: 1 },
 ];
+
 let currentPosition = 0;
 let startTime = null;
 let wpmTimerId = null;
 let lives = INITIAL_LIVES;
+let previousLives = INITIAL_LIVES; 
 let errorsSinceLastLifeLoss = 0;
 let sessionEnded = false;
 let consecutiveCorrectWords = 0;
@@ -18,9 +21,9 @@ let multiplier = 1;
 let peakMultiplier = 1;
 let currentWordHasError = false;
 
-const typedCharacters = []; //An array of all the typed characters
+const typedCharacters = []; // An array of all typed characters
 
-//Gets the references (IDs) of certain values in the HTML so that you can read and update them
+// Gets references to HTML elements so JavaScript can read and update them
 const targetTextElement = document.getElementById("target-text");
 const currentPositionElement = document.getElementById("current-position");
 const statusElement = document.getElementById("status");
@@ -29,7 +32,23 @@ const accuracyElement = document.getElementById("accuracy");
 const livesElement = document.getElementById("lives");
 const multiplierElement = document.getElementById("multiplier");
 
-targetTextElement.textContent = targetText; //The text that will be displayed on the browser
+// Clear the target text container before adding the text
+targetTextElement.innerHTML = "";
+
+// Render the target text as individual <span> elements.
+// This allows each character to be styled separately as correct, incorrect, or current.
+for (let i = 0; i < targetText.length; i++) {
+  const characterSpan = document.createElement("span");
+  characterSpan.textContent = targetText[i];
+  characterSpan.classList.add("character");
+
+  // Highlight the first character as the starting cursor position
+  if (i === 0) {
+    characterSpan.classList.add("current");
+  }
+
+  targetTextElement.appendChild(characterSpan);
+}
 
 function calculateMinutesElapsed() {
   if (startTime === null) {
@@ -54,44 +73,65 @@ function calculateAccuracy() {
     return 100;
   }
 
-  const correctCharacters = typedCharacters.filter((entry) => entry.isCorrect).length; //Filters characters by correctness
+  const correctCharacters = typedCharacters.filter((entry) => entry.isCorrect).length;
 
   return (correctCharacters / typedCharacters.length) * 100;
 }
 
-//Final score formula: WPM × accuracy% × peak multiplier reached during the session
-//Example: WPM=60, accuracy=95%, peakMultiplier=2 → score = 60 × 0.95 × 2 = 114
+// Final score formula: WPM × accuracy% × peak multiplier reached during the session
 function calculateFinalScore() {
   const wpm = calculateWpm();
   const accuracyPercent = calculateAccuracy();
   const accuracyRatio = accuracyPercent / 100;
+
   return Math.round(wpm * accuracyRatio * peakMultiplier);
 }
 
-//Returns the multiplier value for a given streak length, based on the configured thresholds
+// Returns the multiplier value for a given streak length
 function multiplierForStreak(streak) {
   for (const tier of MULTIPLIER_THRESHOLDS) {
     if (streak >= tier.minStreak) {
       return tier.multiplier;
     }
   }
+
   return 1;
 }
 
-//Sets the wpm and accuracy on the browser to the correct values
+// Updates the WPM and accuracy numbers shown on the game screen.
+// WPM is shown as a whole number.
+// Accuracy is shown as a percentage with 1 decimal place.
 function updateStatsDisplay() {
   const wpm = calculateWpm();
   const accuracy = calculateAccuracy();
 
   wpmElement.textContent = String(Math.round(wpm));
-  accuracyElement.textContent = String(Math.round(accuracy));
+  accuracyElement.textContent = accuracy.toFixed(1) + "%";
 }
 
+// Updates the lives display using heart icons.
+// Only the remaining lives are shown as full hearts.
+// Used AI here!
 function updateLivesDisplay() {
-  livesElement.textContent = String(lives);
+  const fullHeart = "❤️";
+
+  livesElement.textContent = fullHeart.repeat(lives);
+
+  // If the current lives are lower than before, play the life lost animation.
+  if (lives < previousLives) {
+    livesElement.classList.add("life-lost");
+
+    // Remove the animation class after it finishes,
+    // so it can run again next time a life is lost.
+    setTimeout(function () {
+      livesElement.classList.remove("life-lost");
+    }, 250);
+  }
+
+  previousLives = lives;
 }
 
-//Updates the multiplier display so Person B's UI can read it
+// Updates the multiplier display so the UI can show the current streak multiplier
 function updateMultiplierDisplay() {
   multiplierElement.textContent = String(multiplier) + "x";
 }
@@ -102,7 +142,9 @@ function startTimerIfNeeded() {
   }
 
   startTime = Date.now();
-  wpmTimerId = setInterval(updateStatsDisplay, 1000); //updates the display every second (every 1000 milliseconds)
+
+  // Updates the WPM and accuracy display every second
+  wpmTimerId = setInterval(updateStatsDisplay, 1000);
 
   console.log("Session timer started:", startTime);
 }
@@ -111,6 +153,7 @@ function endSession(reason) {
   if (sessionEnded) {
     return;
   }
+
   sessionEnded = true;
 
   if (wpmTimerId !== null) {
@@ -118,8 +161,9 @@ function endSession(reason) {
     wpmTimerId = null;
   }
 
-  //Build the session result object — this is what gets sent to the backend (Issue #16)
-  //and rendered on the results screen by Person B
+  // Build the session result object.
+  // Person B uses this for the results screen.
+  // Person C can use this for saving the session to the backend.
   const sessionResult = {
     wpm: Math.round(calculateWpm()),
     accuracy: Math.round(calculateAccuracy()),
@@ -128,7 +172,6 @@ function endSession(reason) {
     timestamp: new Date().toISOString(),
   };
 
-  //Extra debug info — not part of the API contract, just useful for development
   const debugSummary = {
     ...sessionResult,
     reason,
@@ -141,28 +184,29 @@ function endSession(reason) {
 
   console.log("Session ended:", debugSummary);
 
-  //Person B (results screen) and Person C (API call) both listen for this event
+  // Sends the final session data to other files, like script.js
   document.dispatchEvent(new CustomEvent("sessionend", { detail: sessionResult }));
 }
 
-document.addEventListener("keydown", (event) => { //Makes the following function run every time a key is pressed
-  
-  //Ignore input after the session has ended
+document.addEventListener("keydown", (event) => {
+  // Ignore input after the session has ended
   if (sessionEnded) {
     return;
   }
-  
-  //Ignores clicks that are Tab, Enter or a non-character key
+
+  // Prevent Tab and Enter from interfering with the game
   if (event.key === "Tab" || event.key === "Enter") {
     event.preventDefault();
   }
+
+  // Ignore non-character keys like Shift, Control, ArrowLeft, etc.
   if (event.key.length !== 1) {
     return;
   }
 
   startTimerIfNeeded();
 
-  //Stops accepting input if the user tries to write more characters than the length of the target text
+  // Stop accepting input if the user already reached the end of the target text
   if (currentPosition >= targetText.length) {
     return;
   }
@@ -171,7 +215,25 @@ document.addEventListener("keydown", (event) => { //Makes the following function
   const expectedCharacter = targetText[currentPosition];
   const isCorrect = typedCharacter === expectedCharacter;
 
-  //Creates an object describing the keypress, stores information in the typedCharacters-array
+  // Checks if the current character finishes a word.
+  // This is used for streak and multiplier logic.
+  const isAtWordBoundary =
+    expectedCharacter === " " || currentPosition === targetText.length - 1;
+
+  // Get all character spans from the page
+  const characterSpans = document.querySelectorAll(".character");
+
+  // Remove the current-character highlight from the character being typed
+  characterSpans[currentPosition].classList.remove("current");
+
+  // Add green/red visual feedback depending on whether the typed character is correct
+  if (isCorrect) {
+    characterSpans[currentPosition].classList.add("correct");
+  } else {
+    characterSpans[currentPosition].classList.add("incorrect");
+  }
+
+  // Store information about this keypress
   typedCharacters.push({
     position: currentPosition,
     typedCharacter,
@@ -179,8 +241,8 @@ document.addEventListener("keydown", (event) => { //Makes the following function
     isCorrect,
   });
 
-  //Lives system: count cumulative errors, deduct a life on threshold breach
-  //Streak system: reset multiplier and streak on any error, mark current word as broken
+  // Lives system: count errors and deduct a life when the error threshold is reached.
+  // Streak system: reset multiplier and streak on any error.
   if (!isCorrect) {
     errorsSinceLastLifeLoss += 1;
 
@@ -190,13 +252,11 @@ document.addEventListener("keydown", (event) => { //Makes the following function
       console.log("Life lost. Lives remaining:", lives);
     }
 
-    //Streak resets immediately on any error
     consecutiveCorrectWords = 0;
     multiplier = 1;
     currentWordHasError = true;
   }
 
-  //Prints information to the console for debugging
   console.log({
     position: currentPosition,
     typedCharacter,
@@ -211,23 +271,36 @@ document.addEventListener("keydown", (event) => { //Makes the following function
     peakMultiplier,
   });
 
+  // Move to the next character
   currentPosition += 1;
 
+  // Move the current-character highlight to the next character
+  if (currentPosition < characterSpans.length) {
+    characterSpans[currentPosition].classList.add("current");
+  }
+
+  // If a word was completed, update streak and multiplier
   if (isAtWordBoundary) {
     if (!currentWordHasError) {
       consecutiveCorrectWords += 1;
       multiplier = multiplierForStreak(consecutiveCorrectWords);
+
       if (multiplier > peakMultiplier) {
         peakMultiplier = multiplier;
       }
+
       console.log(
-        "Word completed correctly. Streak:", consecutiveCorrectWords,
-        "Multiplier:", multiplier + "x",
-        "Peak multiplier:", peakMultiplier + "x"
+        "Word completed correctly. Streak:",
+        consecutiveCorrectWords,
+        "Multiplier:",
+        multiplier + "x",
+        "Peak multiplier:",
+        peakMultiplier + "x"
       );
     } else {
       console.log("Word completed with errors. Streak stays at 0.");
     }
+
     currentWordHasError = false;
   }
 
@@ -238,11 +311,12 @@ document.addEventListener("keydown", (event) => { //Makes the following function
   updateMultiplierDisplay();
   updateStatsDisplay();
 
-  //End session early if lives are gone, otherwise on full text completion
+  // End session early if lives are gone, otherwise end when the text is complete
   if (lives <= 0) {
     endSession("out of lives");
     return;
   }
+
   if (currentPosition >= targetText.length) {
     endSession("text complete");
   }
