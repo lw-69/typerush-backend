@@ -1,4 +1,4 @@
-const targetText = "hello world"; //The text that is supposed to be written by the user
+const targetText = "the quick brown fox jumps over a lazy dog"; //The text that is supposed to be written by the user
 const INITIAL_LIVES = 3;
 const ERROR_THRESHOLD = 3;
 const MODE = "words";
@@ -213,7 +213,9 @@ document.addEventListener("keydown", (event) => { //Makes the following function
 
   currentPosition += 1;
 
-  if (isAtWordBoundary) {
+  const wordIsAtBoundary = expectedCharacter === " " || currentPosition >= targetText;
+
+  if (wordIsAtBoundary) {
     if (!currentWordHasError) {
       consecutiveCorrectWords += 1;
       multiplier = multiplierForStreak(consecutiveCorrectWords);
