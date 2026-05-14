@@ -7,6 +7,13 @@ const MULTIPLIER_THRESHOLDS = [
   { minStreak: 10, multiplier: 2 },
   { minStreak: 0, multiplier: 1 },
 ];
+const DIFFICULTY_LEVELS = [
+  {minWpm: 90, level: "Expert"},
+  {minWpm: 70, level: "Hard"},
+  {minWpm: 50, level: "Medium"},
+  {minWpm: 0, level: "Easy"},
+];
+let difficulty = "Easy";
 let currentPosition = 0;
 let startTime = null;
 let wpmTimerId = null;
@@ -111,6 +118,25 @@ function startTimerIfNeeded() {
   wpmTimerId = setInterval(updateStatsDisplay, 1000); //updates the display every second (every 1000 milliseconds)
 
   console.log("Session timer started:", startTime);
+}
+
+function difficultyLevel() {
+  for (const tier of DIFFICULTY_LEVELS) {
+    if (calculateWpm() >= tier.minWpm) {
+      return tier.level;
+    }
+  }
+  return "Easy";
+}
+
+function maybeUpgradeDifficulty() {
+  if (MODE !== "words") return; //only applies in word mode
+
+  const newDifficulty = difficultyLevel();
+  if (newDifficulty !== difficulty) {
+    console.log(`Difficulty changed: ${difficulty} → ${newDifficulty}`);
+    difficulty = newDifficulty;
+  }
 }
 
 function endSession(reason) {
@@ -246,7 +272,8 @@ document.addEventListener("keydown", (event) => { //Makes the following function
   updateMultiplierDisplay();
   updateStatsDisplay();
   updateScoreDisplay();
-
+  maybeUpgradeDifficulty();
+  
   //End session early if lives are gone, otherwise on full text completion
   if (lives <= 0) {
     endSession("out of lives");
