@@ -34,6 +34,11 @@ const sessionSchema = new mongoose.Schema({
     timestamp: {
         type: Date,
         default: Date.now // If no timestamp is provided when creating a session, it will automatically set to the current date and time
+    },
+    keyAccuracy: { 
+        type: Map, 
+        of: Object, 
+        required: false 
     }
 });
 
