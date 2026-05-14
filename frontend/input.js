@@ -1,7 +1,8 @@
-const targetText = "the quick brown fox jumps over a lazy dog"; //The text that is supposed to be written by the user
+let targetText = "";
+let mode = "words";
+
 const INITIAL_LIVES = 3;
 const ERROR_THRESHOLD = 3;
-const MODE = "words";
 const MULTIPLIER_THRESHOLDS = [
   { minStreak: 25, multiplier: 3 },
   { minStreak: 10, multiplier: 2 },
@@ -37,7 +38,31 @@ const multiplierElement = document.getElementById("multiplier");
 const scoreElement = document.getElementById("score");
 const highScoreElement = document.getElementById("high-score");
 
-targetTextElement.textContent = targetText; //The text that will be displayed on the browser
+//Fetches content for the current mode from Person C's backend and starts the game.
+//The mode determines which endpoint we call: /content/words, /content/sentences, /content/code
+async function initGame() {
+  try {
+    const response = await fetch(`https://typerush-5imc.onrender.com/content/${mode}`);
+    const data = await response.json();
+
+    //Adjust based on Person C's actual response shape
+    targetText = data.content.join(" ");
+
+    //Now that we have the text, paint it on the screen and initialize displays
+    targetTextElement.textContent = targetText;
+    updateStatsDisplay();
+    updateLivesDisplay();
+    updateMultiplierDisplay();
+    updateScoreDisplay();
+
+    console.log("Game initialized. Mode:", mode, "Text:", targetText);
+  } catch (error) {
+    console.error("Failed to fetch content from backend:", error);
+    targetTextElement.textContent = "Failed to load content. Please refresh.";
+  }
+}
+
+initGame();
 
 function calculateMinutesElapsed() {
   if (startTime === null) {
@@ -129,7 +154,7 @@ function difficultyLevel() {
 }
 
 function maybeUpgradeDifficulty() {
-  if (MODE !== "words") return; //only applies in word mode
+  if (mode !== "words") return; //only applies in word mode
 
   const newDifficulty = difficultyLevel();
   if (newDifficulty !== difficulty) {
@@ -155,7 +180,7 @@ function endSession(reason) {
     wpm: Math.round(calculateWpm()),
     accuracy: Math.round(calculateAccuracy()),
     score: calculateFinalScore(),
-    mode: MODE,
+    mode: mode,
     timestamp: new Date().toISOString(),
   };
 
@@ -282,8 +307,3 @@ document.addEventListener("keydown", (event) => { //Makes the following function
     endSession("text complete");
   }
 });
-
-updateStatsDisplay();
-updateLivesDisplay();
-updateMultiplierDisplay();
-updateScoreDisplay();
