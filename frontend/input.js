@@ -8,9 +8,8 @@ const MULTIPLIER_THRESHOLDS = [
   { minStreak: 0, multiplier: 1 },
 ];
 const DIFFICULTY_LEVELS = [
-  {minWpm: 90, level: "Expert"},
-  {minWpm: 70, level: "Hard"},
-  {minWpm: 50, level: "Medium"},
+  {minWpm: 90, level: "Hard"},
+  {minWpm: 60, level: "Medium"},
   {minWpm: 0, level: "Easy"},
 ];
 let difficulty = "Easy";
