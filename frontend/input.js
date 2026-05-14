@@ -28,6 +28,8 @@ const wpmElement = document.getElementById("wpm");
 const accuracyElement = document.getElementById("accuracy");
 const livesElement = document.getElementById("lives");
 const multiplierElement = document.getElementById("multiplier");
+const scoreElement = document.getElementById("score");
+const highScoreElement = document.getElementById("high-score");
 
 targetTextElement.textContent = targetText; //The text that will be displayed on the browser
 
@@ -94,6 +96,10 @@ function updateLivesDisplay() {
 //Updates the multiplier display so Person B's UI can read it
 function updateMultiplierDisplay() {
   multiplierElement.textContent = String(multiplier) + "x";
+}
+
+function updateScoreDisplay() {
+  scoreElement.textContent = calculateFinalScore();
 }
 
 function startTimerIfNeeded() {
@@ -213,7 +219,7 @@ document.addEventListener("keydown", (event) => { //Makes the following function
 
   currentPosition += 1;
 
-  const wordIsAtBoundary = expectedCharacter === " " || currentPosition >= targetText;
+  const wordIsAtBoundary = expectedCharacter === " " || currentPosition >= targetText.length;
 
   if (wordIsAtBoundary) {
     if (!currentWordHasError) {
@@ -239,6 +245,7 @@ document.addEventListener("keydown", (event) => { //Makes the following function
   updateLivesDisplay();
   updateMultiplierDisplay();
   updateStatsDisplay();
+  updateScoreDisplay();
 
   //End session early if lives are gone, otherwise on full text completion
   if (lives <= 0) {
@@ -253,3 +260,4 @@ document.addEventListener("keydown", (event) => { //Makes the following function
 updateStatsDisplay();
 updateLivesDisplay();
 updateMultiplierDisplay();
+updateScoreDisplay();
