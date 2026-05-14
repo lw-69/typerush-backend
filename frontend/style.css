@@ -204,3 +204,35 @@ button:hover {
   background-color: var(--accent);
   color: var(--background);
 }
+
+#lives {
+  letter-spacing: 2px;
+  font-size: 18px;
+}
+
+.life-lost {
+  animation: lifeShake 0.25s ease;
+}
+
+/* This controls the quick left-right shake effect */
+@keyframes lifeShake {
+  0% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-4px);
+  }
+
+  50% {
+    transform: translateX(4px);
+  }
+
+  75% {
+    transform: translateX(-4px);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}

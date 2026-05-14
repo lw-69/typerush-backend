@@ -13,6 +13,7 @@ let currentPosition = 0;
 let startTime = null;
 let wpmTimerId = null;
 let lives = INITIAL_LIVES;
+let previousLives = INITIAL_LIVES; 
 let errorsSinceLastLifeLoss = 0;
 let sessionEnded = false;
 let consecutiveCorrectWords = 0;
@@ -108,8 +109,26 @@ function updateStatsDisplay() {
   accuracyElement.textContent = accuracy.toFixed(1) + "%";
 }
 
+// Updates the lives display using heart icons.
+// Only the remaining lives are shown as full hearts.
+// Used AI here!
 function updateLivesDisplay() {
-  livesElement.textContent = String(lives);
+  const fullHeart = "❤️";
+
+  livesElement.textContent = fullHeart.repeat(lives);
+
+  // If the current lives are lower than before, play the life lost animation.
+  if (lives < previousLives) {
+    livesElement.classList.add("life-lost");
+
+    // Remove the animation class after it finishes,
+    // so it can run again next time a life is lost.
+    setTimeout(function () {
+      livesElement.classList.remove("life-lost");
+    }, 250);
+  }
+
+  previousLives = lives;
 }
 
 // Updates the multiplier display so the UI can show the current streak multiplier
