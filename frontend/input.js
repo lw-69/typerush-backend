@@ -62,6 +62,28 @@ async function initGame() {
   }
 }
 
+async function saveSession(sessionResult) {
+  try {
+    const response = await fetch(
+      "https://typerush-5imc.onrender.com/sessions",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(sessionResult),
+      }
+    );
+
+    const data = await response.json();
+
+    console.log("Saved:", data);
+
+  } catch (error) {
+    console.error("Error saving session:", error);
+  }
+}
+
 initGame();
 
 function calculateMinutesElapsed() {
@@ -196,6 +218,8 @@ function endSession(reason) {
   };
 
   console.log("Session ended:", debugSummary);
+
+  saveSession(sessionResult);
 
   //Person B (results screen) and Person C (API call) both listen for this event
   document.dispatchEvent(new CustomEvent("sessionend", { detail: sessionResult }));
