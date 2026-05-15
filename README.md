@@ -120,3 +120,6 @@ The API will be available at `http://localhost:5000`. Open to see in browser.
 - The `.env` file is listed in `.gitignore` and must be created locally
 - For local setup, create a personal free MongoDB Atlas account and cluster
 
+## AI usage
+
+> TO BE WRITTEN
