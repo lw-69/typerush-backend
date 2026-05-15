@@ -1,0 +1,238 @@
+/* This loads a font from Google Fonts (Fira Code) */
+/* Fira Code is a monospace font (good for typing/code look) */
+@import url("https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap");
+
+/* Colour palette */
+/* :root, are global variables */
+:root {
+    --background: #0a0a0a;
+    --card: #111827;
+    --primary: #00e5ff;
+    --accent: #ff00c8;
+    --correct: #39ff14;
+    --error: #ff3131;
+    --text: #f5f5f5;
+    --muted-text: #9ca3af;
+}
+
+/* Basic page layout */
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Times New Roman', Times, serif;
+    background-color: var(--background);
+    color: var(--text);
+
+    /* This centers the whole app horizontally and vertically */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Hide screens that are not active */
+.hidden {
+    display: none;
+}
+
+/* Shared screen style */
+/* Every <section> (menu/game/results) gets this style */
+section {
+  width: 90%;
+  max-width: 800px;
+  background-color: var(--card);
+  padding: 40px;
+  border-radius: 16px;
+  text-align: center;
+}
+
+/* Headings */
+h1 {
+  color: var(--primary);
+  font-size: 48px;
+  margin-bottom: 10px;
+}
+/* Title for mode and difficulty */
+h2 {
+  color: var(--accent);
+  margin-top: 25px;
+}
+
+/* Paragraph text */
+/* Makes normal text softer and less bright*/
+p {
+    color: var(--muted-text);
+}
+
+/* Select boxes and buttons */
+select,
+button,
+input {
+  font-size: 16px;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  margin: 8px;
+}
+
+/* Buttons */
+button {
+  background-color: var(--primary);
+  color: var(--background);
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* When you hover it becomes slightly transparent */
+button:hover {
+    opacity: 0.85;
+}
+
+/* Typing text display */
+#text-display {
+  font-family: "Fira Code", monospace;
+  background-color: #020617;
+  padding: 24px;
+  border-radius: 12px;
+  margin: 24px 0;
+  line-height: 1.8;
+  font-size: 20px;
+}
+
+/* Typing input */
+#typing-input {
+    width: 80%;
+    max-width: 500px;
+}
+
+/* Container for the live game stats such as WPM, accuracy, lives, streak, and timer.
+   The flex layout keeps the cards in one row when there is space,
+   and wraps them on smaller screens. */
+.stats-panel {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin: 24px 0;
+}
+
+/* Individual stat box.
+   The dark background separates the stats from the main game area
+   without making them too distracting. */
+.stat-card {
+  min-width: 80px;
+  background-color: #020617;
+  border-radius: 10px;
+  padding: 8px 12px;
+  text-align: center;
+}
+
+/* Small label text above each stat value, like "WPM" or "Accuracy". */
+.stat-label {
+  display: block;
+  font-size: 12px;
+  color: var(--muted-text);
+  margin-bottom: 4px;
+}
+
+/* Main stat value, like "54", "98.5%", or "1x". */
+.stat-value {
+  display: block;
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--text);
+}
+
+/* Results screen layout */
+.results-panel {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin: 24px 0;
+}
+
+/* One card for each final result value */
+.result-card {
+  min-width: 100px;
+  background-color: #020617;
+  border-radius: 10px;
+  padding: 10px 14px;
+  text-align: center;
+}
+
+/* Small label text, like "Final WPM" or "Score" */
+.result-label {
+  display: block;
+  font-size: 12px;
+  color: var(--muted-text);
+  margin-bottom: 4px;
+}
+
+/* Main result value */
+.result-value {
+  display: block;
+  font-size: 20px;
+  font-weight: bold;
+  color: var(--text);
+}
+
+/* Badge shown only when the player sets a new personal best */
+#new-best-badge {
+  color: var(--correct);
+  font-size: 22px;
+  font-weight: bold;
+}
+
+/* Base style for every character */
+.character {
+  padding: 2px;
+  border-radius: 4px;
+}
+
+/* Correctly typed characters become green */
+.correct {
+  color: var(--correct);
+}
+
+/* Incorrectly typed characters become red */
+.incorrect {
+  color: var(--error);
+}
+
+/* Current typing position */
+.current {
+  background-color: var(--accent);
+  color: var(--background);
+}
+
+#lives {
+  letter-spacing: 2px;
+  font-size: 18px;
+}
+
+.life-lost {
+  animation: lifeShake 0.25s ease;
+}
+
+/* This controls the quick left-right shake effect */
+@keyframes lifeShake {
+  0% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-4px);
+  }
+
+  50% {
+    transform: translateX(4px);
+  }
+
+  75% {
+    transform: translateX(-4px);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}
