@@ -1,13 +1,36 @@
-const targetText = "hello world"; // The text that is supposed to be written by the user
+let targetText = "";
+let mode = "words";
+const DIFFICULTY_SETTINGS = {
+  easy: {
+    errorThreshold: 15,
+    multiplierThresholds: [
+      { minStreak: 15, multiplier: 3 },
+      { minStreak: 5,  multiplier: 2 },
+      { minStreak: 0,  multiplier: 1 },
+    ],
+  },
+  medium: {
+    errorThreshold: 3,
+    multiplierThresholds: [
+      { minStreak: 25, multiplier: 3 },
+      { minStreak: 10, multiplier: 2 },
+      { minStreak: 0,  multiplier: 1 },
+    ],
+  },
+  hard: {
+    errorThreshold: 1,
+    multiplierThresholds: [
+      { minStreak: 40, multiplier: 3 },
+      { minStreak: 20, multiplier: 2 },
+      { minStreak: 0,  multiplier: 1 },
+    ],
+  },
+};
 const INITIAL_LIVES = 3;
-const ERROR_THRESHOLD = 3;
-const MODE = "words";
-
-const MULTIPLIER_THRESHOLDS = [
-  { minStreak: 25, multiplier: 3 },
-  { minStreak: 10, multiplier: 2 },
-  { minStreak: 0, multiplier: 1 },
-];
+//These are set when the session starts based on `difficulty`
+let difficulty = "medium";
+let errorThreshold = DIFFICULTY_SETTINGS[difficulty].errorThreshold;
+let multiplierThresholds = DIFFICULTY_SETTINGS[difficulty].multiplierThresholds;
 
 let currentPosition = 0;
 let startTime = null;
@@ -32,23 +55,86 @@ const wpmElement = document.getElementById("wpm");
 const accuracyElement = document.getElementById("accuracy");
 const livesElement = document.getElementById("lives");
 const multiplierElement = document.getElementById("multiplier");
+const scoreElement = document.getElementById("score");
+const highScoreElement = document.getElementById("high-score");
 
-// Clear the target text container before adding the text
-targetTextElement.innerHTML = "";
+//Fetches content for the current mode from Person C's backend and starts the game.
+//The mode determines which endpoint we call: /content/words, /content/sentences, /content/code
+async function initGame() {
+  try {
+    const response = await fetch(`https://typerush-5imc.onrender.com/content/${mode}`);
+    const data = await response.json();
 
-// Render the target text as individual <span> elements.
-// This allows each character to be styled separately as correct, incorrect, or current.
-for (let i = 0; i < targetText.length; i++) {
-  const characterSpan = document.createElement("span");
-  characterSpan.textContent = targetText[i];
-  characterSpan.classList.add("character");
+    //Adjust based on Person C's actual response shape
+    targetText = data.content.join(" ");
 
-  // Highlight the first character as the starting cursor position
-  if (i === 0) {
-    characterSpan.classList.add("current");
+    // Clear the target text container before adding the text
+    targetTextElement.innerHTML = "";
+
+    // Render the target text as individual <span> elements.
+    // This allows each character to be styled separately as correct, incorrect, or current.
+    for (let i = 0; i < targetText.length; i++) {
+      const characterSpan = document.createElement("span");
+      characterSpan.textContent = targetText[i];
+      characterSpan.classList.add("character");
+
+      // Highlight the first character as the starting cursor position
+      if (i === 0) {
+        characterSpan.classList.add("current");
+      }
+
+      targetTextElement.appendChild(characterSpan);
+    }
+
+    //Initialize displays now that the text is on screen
+    updateStatsDisplay();
+    updateLivesDisplay();
+    updateMultiplierDisplay();
+    updateScoreDisplay();
+
+    console.log("Game initialized. Mode:", mode, "Text:", targetText);
+  } catch (error) {
+    console.error("Failed to fetch content from backend:", error);
+    targetTextElement.textContent = "Failed to load content. Please refresh.";
+  }
+}
+
+//Called by Person B's menu when the user picks a difficulty and starts a session
+function startGame(selectedDifficulty) {
+  if (!DIFFICULTY_SETTINGS[selectedDifficulty]) {
+    console.warn(`Unknown difficulty "${selectedDifficulty}", defaulting to medium`);
+    selectedDifficulty = "medium";
   }
 
-  targetTextElement.appendChild(characterSpan);
+  difficulty = selectedDifficulty;
+  errorThreshold = DIFFICULTY_SETTINGS[difficulty].errorThreshold;
+  multiplierThresholds = DIFFICULTY_SETTINGS[difficulty].multiplierThresholds;
+
+  console.log(`Game starting on ${difficulty} difficulty. errorThreshold=${errorThreshold}`);
+
+  initGame();
+}
+
+async function saveSession(sessionResult) {
+  try {
+    const response = await fetch(
+      "https://typerush-5imc.onrender.com/sessions",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(sessionResult),
+      }
+    );
+
+const data = await response.json();
+
+    console.log("Saved:", data);
+
+  } catch (error) {
+    console.error("Error saving session:", error);
+  }
 }
 
 function calculateMinutesElapsed() {
@@ -90,7 +176,7 @@ function calculateFinalScore() {
 
 // Returns the multiplier value for a given streak length
 function multiplierForStreak(streak) {
-  for (const tier of MULTIPLIER_THRESHOLDS) {
+  for (const tier of multiplierThresholds) {
     if (streak >= tier.minStreak) {
       return tier.multiplier;
     }
@@ -157,6 +243,10 @@ function updateMultiplierDisplay() {
   previousMultiplier = multiplier;
 }
 
+function updateScoreDisplay() {
+  scoreElement.textContent = calculateFinalScore();
+}
+
 function startTimerIfNeeded() {
   if (startTime !== null) {
     return;
@@ -189,7 +279,8 @@ function endSession(reason) {
     wpm: Math.round(calculateWpm()),
     accuracy: Math.round(calculateAccuracy()),
     score: calculateFinalScore(),
-    mode: MODE,
+    mode: mode,
+    difficulty: difficulty,
     timestamp: new Date().toISOString(),
   };
 
@@ -205,7 +296,10 @@ function endSession(reason) {
 
   console.log("Session ended:", debugSummary);
 
-  // Sends the final session data to other files, like script.js
+  saveSession(sessionResult);
+
+  //Person B (results screen) and Person C (API call) both listen for this event
+
   document.dispatchEvent(new CustomEvent("sessionend", { detail: sessionResult }));
 }
 
@@ -236,12 +330,7 @@ document.addEventListener("keydown", (event) => {
   const expectedCharacter = targetText[currentPosition];
   const isCorrect = typedCharacter === expectedCharacter;
 
-  // Checks if the current character finishes a word.
-  // This is used for streak and multiplier logic.
-  const isAtWordBoundary =
-    expectedCharacter === " " || currentPosition === targetText.length - 1;
-
-  // Get all character spans from the page
+// Get all character spans from the page
   const characterSpans = document.querySelectorAll(".character");
 
   // Remove the current-character highlight from the character being typed
@@ -267,7 +356,7 @@ document.addEventListener("keydown", (event) => {
   if (!isCorrect) {
     errorsSinceLastLifeLoss += 1;
 
-    if (errorsSinceLastLifeLoss >= ERROR_THRESHOLD) {
+    if (errorsSinceLastLifeLoss >= errorThreshold) {
       lives -= 1;
       errorsSinceLastLifeLoss = 0;
       console.log("Life lost. Lives remaining:", lives);
@@ -294,6 +383,9 @@ document.addEventListener("keydown", (event) => {
 
   // Move to the next character
   currentPosition += 1;
+
+  // Check if a word was just completed (space in target, or end of text)
+  const isAtWordBoundary = expectedCharacter === " " || currentPosition >= targetText.length;
 
   // Move the current-character highlight to the next character
   if (currentPosition < characterSpans.length) {
@@ -332,7 +424,10 @@ document.addEventListener("keydown", (event) => {
   updateMultiplierDisplay();
   updateStatsDisplay();
 
-  // End session early if lives are gone, otherwise end when the text is complete
+  updateScoreDisplay();
+  
+  //End session early if lives are gone, otherwise on full text completion
+
   if (lives <= 0) {
     endSession("out of lives");
     return;
@@ -342,7 +437,4 @@ document.addEventListener("keydown", (event) => {
     endSession("text complete");
   }
 });
-
-updateStatsDisplay();
-updateLivesDisplay();
-updateMultiplierDisplay();
+//startGame("medium");
