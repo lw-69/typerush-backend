@@ -13,6 +13,62 @@ const finishBtn = document.getElementById("finish-btn");
 const playAgainBtn = document.getElementById("play-again-btn");
 const backMenuBtn = document.getElementById("back-menu-btn");
 
+// =========================
+// Main menu selector logic
+// =========================
+
+// Stores the currently selected mode and difficulty.
+// These values can later be used by the game logic/backend content routes.
+let selectedMode = "words";
+let selectedDifficulty = "easy";
+
+// Get all mode and difficulty buttons
+const modeButtons = document.querySelectorAll("[data-mode]");
+const difficultyButtons = document.querySelectorAll("[data-difficulty]");
+const modeDescription = document.getElementById("mode-description");
+
+// Descriptions shown under the mode selector
+const modeDescriptions = {
+  words: "Practice with random words to build speed.",
+  sentences: "Type full sentences to practice flow and accuracy.",
+  code: "Practice typing short code snippets with symbols.",
+};
+
+// Handles mode button clicks
+modeButtons.forEach(function (button) {
+  button.addEventListener("click", function () {
+    // Save selected mode
+    selectedMode = button.dataset.mode;
+
+    // Remove selected style from all mode buttons
+    modeButtons.forEach(function (btn) {
+      btn.classList.remove("selected");
+    });
+
+    // Add selected style to clicked button
+    button.classList.add("selected");
+
+    // Update description text
+    modeDescription.textContent = modeDescriptions[selectedMode];
+  });
+});
+
+// Handles difficulty button clicks
+difficultyButtons.forEach(function (button) {
+  button.addEventListener("click", function () {
+    // Save selected difficulty
+    selectedDifficulty = button.dataset.difficulty;
+
+    // Remove selected style from all difficulty buttons
+    difficultyButtons.forEach(function (btn) {
+      btn.classList.remove("selected");
+    });
+
+    // Add selected style to clicked button
+    button.classList.add("selected");
+  });
+});
+
 // Function to show one screen and hide the others.
 function showScreen(screen) {
   // Hide all screens

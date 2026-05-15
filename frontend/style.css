@@ -87,6 +87,54 @@ button:hover {
     opacity: 0.85;
 }
 
+
+/* Groups toggle buttons together for mode and difficulty selection */
+/* Used AI for inspiration */
+.toggle-group {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 12px 0;
+}
+
+/* Toggle buttons used for mode and difficulty choices */
+.toggle-button {
+  background-color: #020617;
+  color: var(--text);
+  border: 2px solid transparent;
+  min-width: 110px;
+  transition: 0.2s ease;
+}
+
+/* Hover effect so buttons feel clickable */
+.toggle-button:hover {
+  border-color: var(--primary);
+  opacity: 1;
+}
+
+/* Clearly shows which option is currently selected */
+.toggle-button.selected {
+  background-color: var(--primary);
+  color: var(--background);
+  border-color: var(--primary);
+}
+
+/* Short explanation under the mode selector */
+.mode-description {
+  max-width: 500px;
+  margin: 10px auto 24px;
+  color: var(--muted-text);
+}
+
+/* Makes the main Start button stand out */
+.start-button {
+  margin-top: 28px;
+  padding: 20px 35px;
+  font-size: 22px;
+  background-color: var(--accent);
+}
+
 /* Typing text display */
 #text-display {
   font-family: "Fira Code", monospace;

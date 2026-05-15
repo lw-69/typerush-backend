@@ -20,23 +20,31 @@
 
     <!-- Mode selector -->
     <h2>Choose Mode</h2>
-    <!-- This creates a dropdown where the player chooses the game mode and the value is what JavaScript will read later. -->
-    <select id="mode-select">
-      <option value="words">Words</option>
-      <option value="sentences">Sentences</option>
-      <option value="code">Code</option>
-    </select>
+    
+    <!-- Toggle buttons for selecting the typing mode -->
+  <div class="toggle-group" id="mode-options">
+    <button class="toggle-button selected" data-mode="words">Words</button>
+    <button class="toggle-button" data-mode="sentences">Sentences</button>
+    <button class="toggle-button" data-mode="code">Code</button>
+  </div>
+
+  <!-- Short description that changes depending on selected mode -->
+  <p id="mode-description" class="mode-description">
+    Practice with random words to build speed.
+  </p>
 
     <!-- Difficulty selector -->
     <h2>Choose Difficulty</h2>
-    <select id="difficulty-select">
-      <option value="easy">Easy</option>
-      <option value="medium">Medium</option>
-      <option value="hard">Hard</option>
-    </select>
+
+  <!-- Toggle buttons for selecting difficulty -->
+  <div class="toggle-group" id="difficulty-options">
+    <button class="toggle-button selected" data-difficulty="easy">Easy</button>
+    <button class="toggle-button" data-difficulty="medium">Medium</button>
+    <button class="toggle-button" data-difficulty="hard">Hard</button>
+  </div>
 
     <!-- Start button -->
-    <button id="start-btn">Start Game</button>
+    <button id="start-btn" class="start-button">Start Game</button>
   </section>
 
   <!-- =========================
