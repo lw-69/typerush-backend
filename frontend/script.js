@@ -42,7 +42,7 @@ playAgainBtn.addEventListener("click", function () {
 
 // Back to menu -> return to main menu
 backMenuBtn.addEventListener("click", function () {
-  showScreen(menuScreen);
+  location.reload();
 });
 
 // =========================
@@ -64,7 +64,7 @@ let personalBestWpm = 0;
 // Full route = /sessions + /best = /sessions/best
 async function loadPersonalBest() {
   try {
-    const response = await fetch("http://localhost:5000/sessions/best");
+    const response = await fetch("https://typerush-5imc.onrender.com/sessions/best");
 
     // 404 means no saved sessions exist yet, so personal best stays 0
     if (response.status === 404) {

@@ -236,3 +236,56 @@ button:hover {
     transform: translateX(0);
   }
 }
+
+/* Animation when the streak multiplier increases */
+.multiplier-increase {
+  animation: multiplierPulse 0.25s ease;
+}
+
+/* Animation when the streak multiplier resets */
+.multiplier-reset {
+  animation: multiplierReset 0.25s ease;
+}
+
+/* Brief scale-up pulse, kept under 300ms */
+@keyframes multiplierPulse {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.25);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Brief shake effect, kept under 300ms */
+@keyframes multiplierReset {
+  0% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-4px);
+  }
+
+  50% {
+    transform: translateX(4px);
+  }
+
+  75% {
+    transform: translateX(-4px);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* Without inline-block, transform animations may not work clearly on a <span> */
+#multiplier {
+    display: inline-block;
+}
