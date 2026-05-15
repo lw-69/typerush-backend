@@ -1,19 +1,36 @@
 let targetText = "";
 let mode = "words";
-
+const DIFFICULTY_SETTINGS = {
+  easy: {
+    errorThreshold: 15,
+    multiplierThresholds: [
+      { minStreak: 15, multiplier: 3 },
+      { minStreak: 5,  multiplier: 2 },
+      { minStreak: 0,  multiplier: 1 },
+    ],
+  },
+  medium: {
+    errorThreshold: 3,
+    multiplierThresholds: [
+      { minStreak: 25, multiplier: 3 },
+      { minStreak: 10, multiplier: 2 },
+      { minStreak: 0,  multiplier: 1 },
+    ],
+  },
+  hard: {
+    errorThreshold: 1,
+    multiplierThresholds: [
+      { minStreak: 40, multiplier: 3 },
+      { minStreak: 20, multiplier: 2 },
+      { minStreak: 0,  multiplier: 1 },
+    ],
+  },
+};
 const INITIAL_LIVES = 3;
-const ERROR_THRESHOLD = 3;
-const MULTIPLIER_THRESHOLDS = [
-  { minStreak: 25, multiplier: 3 },
-  { minStreak: 10, multiplier: 2 },
-  { minStreak: 0, multiplier: 1 },
-];
-const DIFFICULTY_LEVELS = [
-  {minWpm: 90, level: "Hard"},
-  {minWpm: 60, level: "Medium"},
-  {minWpm: 0, level: "Easy"},
-];
-let difficulty = "Easy";
+//These are set when the session starts based on `difficulty`
+let difficulty = "medium";
+let errorThreshold = DIFFICULTY_SETTINGS[difficulty].errorThreshold;
+let multiplierThresholds = DIFFICULTY_SETTINGS[difficulty].multiplierThresholds;
 let currentPosition = 0;
 let startTime = null;
 let wpmTimerId = null;
@@ -62,6 +79,22 @@ async function initGame() {
   }
 }
 
+//Called by Person B's menu when the user picks a difficulty and starts a session
+function startGame(selectedDifficulty) {
+  if (!DIFFICULTY_SETTINGS[selectedDifficulty]) {
+    console.warn(`Unknown difficulty "${selectedDifficulty}", defaulting to medium`);
+    selectedDifficulty = "medium";
+  }
+
+  difficulty = selectedDifficulty;
+  errorThreshold = DIFFICULTY_SETTINGS[difficulty].errorThreshold;
+  multiplierThresholds = DIFFICULTY_SETTINGS[difficulty].multiplierThresholds;
+
+  console.log(`Game starting on ${difficulty} difficulty. errorThreshold=${errorThreshold}`);
+
+  initGame();
+}
+
 async function saveSession(sessionResult) {
   try {
     const response = await fetch(
@@ -83,8 +116,6 @@ async function saveSession(sessionResult) {
     console.error("Error saving session:", error);
   }
 }
-
-initGame();
 
 function calculateMinutesElapsed() {
   if (startTime === null) {
@@ -125,7 +156,7 @@ function calculateFinalScore() {
 
 //Returns the multiplier value for a given streak length, based on the configured thresholds
 function multiplierForStreak(streak) {
-  for (const tier of MULTIPLIER_THRESHOLDS) {
+  for (const tier of multiplierThresholds) {
     if (streak >= tier.minStreak) {
       return tier.multiplier;
     }
@@ -166,25 +197,6 @@ function startTimerIfNeeded() {
   console.log("Session timer started:", startTime);
 }
 
-function difficultyLevel() {
-  for (const tier of DIFFICULTY_LEVELS) {
-    if (calculateWpm() >= tier.minWpm) {
-      return tier.level;
-    }
-  }
-  return "Easy";
-}
-
-function maybeUpgradeDifficulty() {
-  if (mode !== "words") return; //only applies in word mode
-
-  const newDifficulty = difficultyLevel();
-  if (newDifficulty !== difficulty) {
-    console.log(`Difficulty changed: ${difficulty} → ${newDifficulty}`);
-    difficulty = newDifficulty;
-  }
-}
-
 function endSession(reason) {
   if (sessionEnded) {
     return;
@@ -203,6 +215,7 @@ function endSession(reason) {
     accuracy: Math.round(calculateAccuracy()),
     score: calculateFinalScore(),
     mode: mode,
+    difficulty: difficulty,
     timestamp: new Date().toISOString(),
   };
 
@@ -264,7 +277,7 @@ document.addEventListener("keydown", (event) => { //Makes the following function
   if (!isCorrect) {
     errorsSinceLastLifeLoss += 1;
 
-    if (errorsSinceLastLifeLoss >= ERROR_THRESHOLD) {
+    if (errorsSinceLastLifeLoss >= errorThreshold) {
       lives -= 1;
       errorsSinceLastLifeLoss = 0;
       console.log("Life lost. Lives remaining:", lives);
@@ -320,7 +333,6 @@ document.addEventListener("keydown", (event) => { //Makes the following function
   updateMultiplierDisplay();
   updateStatsDisplay();
   updateScoreDisplay();
-  maybeUpgradeDifficulty();
   
   //End session early if lives are gone, otherwise on full text completion
   if (lives <= 0) {
@@ -331,3 +343,4 @@ document.addEventListener("keydown", (event) => { //Makes the following function
     endSession("text complete");
   }
 });
+//startGame("medium");
