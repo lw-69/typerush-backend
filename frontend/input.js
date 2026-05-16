@@ -41,6 +41,7 @@ let errorsSinceLastLifeLoss = 0;
 let sessionEnded = false;
 let consecutiveCorrectWords = 0;
 let multiplier = 1;
+let previousMultiplier = 1;
 let peakMultiplier = 1;
 let currentWordHasError = false;
 
@@ -197,7 +198,6 @@ function updateStatsDisplay() {
 
 // Updates the lives display using heart icons.
 // Only the remaining lives are shown as full hearts.
-// Used AI here!
 function updateLivesDisplay() {
   const fullHeart = "❤️";
 
@@ -217,9 +217,29 @@ function updateLivesDisplay() {
   previousLives = lives;
 }
 
-// Updates the multiplier display so the UI can show the current streak multiplier
+// Updates the multiplier display and plays a small animation when it changes.
+// Increase = pulse animation.
+// Reset/decrease = shake animation.
 function updateMultiplierDisplay() {
   multiplierElement.textContent = String(multiplier) + "x";
+
+  // Remove old animation classes so the animation can restart
+  multiplierElement.classList.remove("multiplier-increase", "multiplier-reset");
+
+  // Force the browser to notice the class removal before adding it again
+  void multiplierElement.offsetWidth;
+
+  // If the multiplier increased, play a pulse animation
+  if (multiplier > previousMultiplier) {
+    multiplierElement.classList.add("multiplier-increase");
+  }
+
+  // If the multiplier decreased/reset, play a shake animation
+  if (multiplier < previousMultiplier) {
+    multiplierElement.classList.add("multiplier-reset");
+  }
+
+  previousMultiplier = multiplier;
 }
 
 function updateScoreDisplay() {

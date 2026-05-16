@@ -35,7 +35,7 @@ body {
 }
 
 /* Shared screen style */
-/* Every <section> (menu/game/results) gets this style */
+/* Every <section> (menu/rules/game/results) gets this style */
 section {
   width: 90%;
   max-width: 800px;
@@ -85,6 +85,90 @@ button {
 /* When you hover it becomes slightly transparent */
 button:hover {
     opacity: 0.85;
+}
+
+
+/* Groups toggle buttons together for mode and difficulty selection */
+/* Used AI for inspiration */
+.toggle-group {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 12px 0;
+}
+
+/* Toggle buttons used for mode and difficulty choices */
+.toggle-button {
+  background-color: #020617;
+  color: var(--text);
+  border: 2px solid transparent;
+  min-width: 110px;
+  transition: 0.2s ease;
+}
+
+/* Hover effect so buttons feel clickable */
+.toggle-button:hover {
+  border-color: var(--primary);
+  opacity: 1;
+}
+
+/* Clearly shows which option is currently selected */
+.toggle-button.selected {
+  background-color: var(--primary);
+  color: var(--background);
+  border-color: var(--primary);
+}
+
+/* Short explanation under the mode selector */
+.mode-description {
+  max-width: 500px;
+  margin: 10px auto 24px;
+  color: var(--muted-text);
+}
+
+/* Makes the main Start button stand out */
+.start-button {
+  margin-top: 28px;
+  padding: 20px 35px;
+  font-size: 22px;
+  background-color: var(--accent);
+}
+
+/* Game Rules button on the main menu */
+.rules-button {
+  background-color: #020617;
+  color: var(--text);
+  border: 2px solid var(--accent);
+  padding: 10px 16px;
+  font-size: 14px;
+  margin: 16px 0;
+}
+
+.rules-button:hover {
+  background-color: var(--accent);
+  color: var(--background);
+}
+
+/* Rules/instructions section */
+.rules-panel {
+  max-width: 650px;
+  margin: 24px auto;
+  text-align: left;
+  background-color: #020617;
+  padding: 24px;
+  border-radius: 12px;
+}
+
+/* Rules headings */
+.rules-panel h2 {
+  margin-top: 18px;
+  margin-bottom: 8px;
+}
+
+/* Rules text */
+.rules-panel p {
+  margin-top: 0;
 }
 
 /* Typing text display */
@@ -235,4 +319,57 @@ button:hover {
   100% {
     transform: translateX(0);
   }
+}
+
+/* Animation when the streak multiplier increases */
+.multiplier-increase {
+  animation: multiplierPulse 0.25s ease;
+}
+
+/* Animation when the streak multiplier resets */
+.multiplier-reset {
+  animation: multiplierReset 0.25s ease;
+}
+
+/* Brief scale-up pulse, kept under 300ms */
+@keyframes multiplierPulse {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.25);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Brief shake effect, kept under 300ms */
+@keyframes multiplierReset {
+  0% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-4px);
+  }
+
+  50% {
+    transform: translateX(4px);
+  }
+
+  75% {
+    transform: translateX(-4px);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* Without inline-block, transform animations may not work clearly on a <span> */
+#multiplier {
+    display: inline-block;
 }

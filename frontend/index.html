@@ -15,29 +15,81 @@
        Main menu screen
    ========================== -->
   <section id="menu-screen">
+
     <h1>TypeRush</h1>
     <p>A typing speed and accuracy game</p>
 
+    <!-- Opens the game rules screen -->
+    <button id="rules-btn" class="rules-button">Game Rules</button>
+
     <!-- Mode selector -->
     <h2>Choose Mode</h2>
-    <!-- This creates a dropdown where the player chooses the game mode and the value is what JavaScript will read later. -->
-    <select id="mode-select">
-      <option value="words">Words</option>
-      <option value="sentences">Sentences</option>
-      <option value="code">Code</option>
-    </select>
+    
+    <!-- Toggle buttons for selecting the typing mode -->
+  <div class="toggle-group" id="mode-options">
+    <button class="toggle-button selected" data-mode="words">Words</button>
+    <button class="toggle-button" data-mode="sentences">Sentences</button>
+    <button class="toggle-button" data-mode="code">Code</button>
+  </div>
+
+  <!-- Short description that changes depending on selected mode -->
+  <p id="mode-description" class="mode-description">
+    Practice with random words to build speed.
+  </p>
 
     <!-- Difficulty selector -->
     <h2>Choose Difficulty</h2>
-    <select id="difficulty-select">
-      <option value="easy">Easy</option>
-      <option value="medium">Medium</option>
-      <option value="hard">Hard</option>
-    </select>
+
+  <!-- Toggle buttons for selecting difficulty -->
+  <div class="toggle-group" id="difficulty-options">
+    <button class="toggle-button selected" data-difficulty="easy">Easy</button>
+    <button class="toggle-button" data-difficulty="medium">Medium</button>
+    <button class="toggle-button" data-difficulty="hard">Hard</button>
+  </div>
 
     <!-- Start button -->
-    <button id="start-btn">Start Game</button>
+    <button id="start-btn" class="start-button">Start Game</button>
   </section>
+
+  <!-- =========================
+     Game rules screen
+    ========================== -->
+    <section id="rules-screen" class="hidden">
+      <h1>Game Rules</h1>
+
+      <div class="rules-panel">
+        <h2>How to Play</h2>
+        <p>
+          Choose a mode and difficulty, then type the text shown on the screen as accurately and quickly as possible.
+        </p>
+
+        <h2>What is Expected</h2>
+        <p>
+          Correct characters will be highlighted in green, while incorrect characters will be highlighted in red.
+          Your WPM, accuracy, score, lives, and multiplier update during the session.
+        </p>
+
+        <h2>Lives</h2>
+        <p>
+          You start with 3 lives. If you make too many mistakes, you lose a life. The game ends when you lose all lives
+          or finish the typing text.
+        </p>
+
+        <h2>Difficulty Scaling</h2>
+        <p>
+          Easy difficulty allows more mistakes and has lower multiplier requirements.
+          Medium is balanced. Hard is stricter and requires longer streaks to increase the multiplier.
+        </p>
+
+        <h2>Scoring</h2>
+        <p>
+          Your final score is based on WPM, accuracy, and the highest multiplier you reached during the session.
+        </p>
+    </div>
+
+    <!-- Returns the user to the main menu -->
+    <button id="rules-back-btn">Go Back</button>
+    </section>
 
   <!-- =========================
        Game screen
@@ -77,20 +129,27 @@
       <span id="multiplier" class="stat-value">1x</span>
     </div>
 
-  <!-- Timer display.
+    <!-- Timer display.
     This will be used later for timed game modes. -->
-  <div class="stat-card">
-    <span class="stat-label">Timer</span>
-    <span class="stat-value"><span id="timer">60</span>s</span>
+    <div class="stat-card">
+      <span class="stat-label">Timer</span>
+      <span class="stat-value"><span id="timer">60</span>s</span>
+    </div>
+    
+    <!-- Live score during the typing session -->
+    <div class="stat-card">
+      <span class="stat-label">Score</span>
+      <span id="score" class="stat-value">0</span>
+    </div>
   </div>
-</div>
+
 
     <!-- Text player will type -->
     <div id="target-text"></div>
 
     <!-- Debug/testing info -->
     <p>Current position: <span id="current-position">0</span></p>
-    <p>Status: <span id="status">Waiting...</span></p>
+    <p>Status: <span id="status">Waiting...</span></p> 
 
     <!-- Input field -->
     <!-- The placeholder is just the grey text shown before the user types. -->
@@ -117,34 +176,39 @@
 
         <!-- Final WPM from Person A's sessionResult -->
         <div class="result-card">
-          <span class="result-label">Final WPM</span>
-          <span id="final-wpm" class="result-value">0</span>
+            <span class="result-label">Final WPM</span>
+            <span id="final-wpm" class="result-value">0</span>
         </div>
-
+        
         <!-- Final accuracy from Person A's sessionResult -->
         <div class="result-card">
-          <span class="result-label">Accuracy</span>
-          <span id="final-accuracy" class="result-value">100.0%</span>
+            <span class="result-label">Accuracy</span>
+            <span id="final-accuracy" class="result-value">100.0%</span>
         </div>
-
+        
         <!-- Final score from Person A's score calculation -->
         <div class="result-card">
-          <span class="result-label">Score</span>
-          <span id="final-score" class="result-value">0</span>
+            <span class="result-label">Score</span>
+            <span id="final-score" class="result-value">0</span>
         </div>
-
+        
         <!-- Personal best from Person C's backend route GET /best -->
         <div class="result-card">
-          <span class="result-label">Personal Best</span>
-          <span id="personal-best" class="result-value">0</span>
+            <span class="result-label">Personal Best</span>
+            <span id="personal-best" class="result-value">0</span>
         </div>
-
+        
         <!-- Game mode played, such as words, sentences, or code -->
         <div class="result-card">
-          <span class="result-label">Mode</span>
-          <span id="final-mode" class="result-value">Words</span>
+            <span class="result-label">Mode</span>
+            <span id="final-mode" class="result-value">Words</span>
         </div>
 
+        <!-- Added difficulty to results screen -->
+        <div class="result-card">
+          <span class="result-label">Difficulty</span>
+          <span id="final-difficulty" class="result-value">Easy</span>
+        </div>
     </div>
 
     <!-- Reloads the page so the player can start again cleanly -->
@@ -156,9 +220,9 @@
 
   <!-- Link to JavaScript -->
   <!-- This connects the HTML to the JavaScript files. It is placed at the bottom so the HTML loads first, then JavaScript can find all the elements. -->
-  <!-- For screen switching -->
-  <script src="script.js"></script>
   <!-- For typing logic -->
   <script src="input.js"></script>
+  <!-- For screen switching -->
+  <script src="script.js"></script>
 </body>
 </html>
