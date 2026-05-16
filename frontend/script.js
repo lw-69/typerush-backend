@@ -13,6 +13,11 @@ const finishBtn = document.getElementById("finish-btn");
 const playAgainBtn = document.getElementById("play-again-btn");
 const backMenuBtn = document.getElementById("back-menu-btn");
 
+// For game rules
+const rulesScreen = document.getElementById("rules-screen");
+const rulesBtn = document.getElementById("rules-btn");
+const rulesBackBtn = document.getElementById("rules-back-btn");
+
 // =========================
 // Main menu selector logic
 // =========================
@@ -71,8 +76,9 @@ difficultyButtons.forEach(function (button) {
 
 // Function to show one screen and hide the others.
 function showScreen(screen) {
-  // Hide all screens
+ 
   menuScreen.classList.add("hidden");
+  rulesScreen.classList.add("hidden");
   gameScreen.classList.add("hidden");
   resultsScreen.classList.add("hidden");
 
@@ -92,6 +98,16 @@ startBtn.addEventListener("click", function () {
 
   // Show the game screen
   showScreen(gameScreen);
+});
+
+// Opens the game rules screen from the main menu
+rulesBtn.addEventListener("click", function () {
+  showScreen(rulesScreen);
+});
+
+// Returns from the rules screen back to the main menu
+rulesBackBtn.addEventListener("click", function () {
+  showScreen(menuScreen);
 });
 
 // When Finish is clicked -> switch to results screen.

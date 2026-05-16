@@ -15,8 +15,12 @@
        Main menu screen
    ========================== -->
   <section id="menu-screen">
+
     <h1>TypeRush</h1>
     <p>A typing speed and accuracy game</p>
+
+    <!-- Opens the game rules screen -->
+    <button id="rules-btn" class="rules-button">Game Rules</button>
 
     <!-- Mode selector -->
     <h2>Choose Mode</h2>
@@ -46,6 +50,46 @@
     <!-- Start button -->
     <button id="start-btn" class="start-button">Start Game</button>
   </section>
+
+  <!-- =========================
+     Game rules screen
+    ========================== -->
+    <section id="rules-screen" class="hidden">
+      <h1>Game Rules</h1>
+
+      <div class="rules-panel">
+        <h2>How to Play</h2>
+        <p>
+          Choose a mode and difficulty, then type the text shown on the screen as accurately and quickly as possible.
+        </p>
+
+        <h2>What is Expected</h2>
+        <p>
+          Correct characters will be highlighted in green, while incorrect characters will be highlighted in red.
+          Your WPM, accuracy, score, lives, and multiplier update during the session.
+        </p>
+
+        <h2>Lives</h2>
+        <p>
+          You start with 3 lives. If you make too many mistakes, you lose a life. The game ends when you lose all lives
+          or finish the typing text.
+        </p>
+
+        <h2>Difficulty Scaling</h2>
+        <p>
+          Easy difficulty allows more mistakes and has lower multiplier requirements.
+          Medium is balanced. Hard is stricter and requires longer streaks to increase the multiplier.
+        </p>
+
+        <h2>Scoring</h2>
+        <p>
+          Your final score is based on WPM, accuracy, and the highest multiplier you reached during the session.
+        </p>
+    </div>
+
+    <!-- Returns the user to the main menu -->
+    <button id="rules-back-btn">Go Back</button>
+    </section>
 
   <!-- =========================
        Game screen
