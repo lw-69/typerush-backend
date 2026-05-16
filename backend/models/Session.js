@@ -6,6 +6,7 @@
  * - accuracy: Accuracy percentage (Number, required)
  * - score: Overall score (Number, required)
  * - mode: Typing mode (String, required, must be 'words', 'sentences', or 'code')
+ * - difficulty: Typing difficulty (String, not required as default is 'medium', must be 'easy', 'medium' or 'hard')
  * - timestamp: Date and time when the session was recorded (Date, defaults to current date/time)
  * 
  * This model will be used to create and manage session records in the MongoDB database.
@@ -30,6 +31,12 @@ const sessionSchema = new mongoose.Schema({
         type: String,
         enum: ['words', 'sentences', 'code'], // restricts the value of mode to be one of these three options, helps maintain data integrity
         required: true
+    },
+    difficulty: {
+        type: String,
+        enum: ['easy', 'medium', 'hard'],
+        required: false,
+        default: 'medium'
     },
     timestamp: {
         type: Date,
