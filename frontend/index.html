@@ -85,13 +85,20 @@
       <span id="multiplier" class="stat-value">1x</span>
     </div>
 
-  <!-- Timer display.
+    <!-- Timer display.
     This will be used later for timed game modes. -->
-  <div class="stat-card">
-    <span class="stat-label">Timer</span>
-    <span class="stat-value"><span id="timer">60</span>s</span>
+    <div class="stat-card">
+      <span class="stat-label">Timer</span>
+      <span class="stat-value"><span id="timer">60</span>s</span>
+    </div>
+    
+    <!-- Live score during the typing session -->
+    <div class="stat-card">
+      <span class="stat-label">Score</span>
+      <span id="score" class="stat-value">0</span>
+    </div>
   </div>
-</div>
+
 
     <!-- Text player will type -->
     <div id="target-text"></div>
@@ -125,34 +132,39 @@
 
         <!-- Final WPM from Person A's sessionResult -->
         <div class="result-card">
-          <span class="result-label">Final WPM</span>
-          <span id="final-wpm" class="result-value">0</span>
+            <span class="result-label">Final WPM</span>
+            <span id="final-wpm" class="result-value">0</span>
         </div>
-
+        
         <!-- Final accuracy from Person A's sessionResult -->
         <div class="result-card">
-          <span class="result-label">Accuracy</span>
-          <span id="final-accuracy" class="result-value">100.0%</span>
+            <span class="result-label">Accuracy</span>
+            <span id="final-accuracy" class="result-value">100.0%</span>
         </div>
-
+        
         <!-- Final score from Person A's score calculation -->
         <div class="result-card">
-          <span class="result-label">Score</span>
-          <span id="final-score" class="result-value">0</span>
+            <span class="result-label">Score</span>
+            <span id="final-score" class="result-value">0</span>
         </div>
-
+        
         <!-- Personal best from Person C's backend route GET /best -->
         <div class="result-card">
-          <span class="result-label">Personal Best</span>
-          <span id="personal-best" class="result-value">0</span>
+            <span class="result-label">Personal Best</span>
+            <span id="personal-best" class="result-value">0</span>
         </div>
-
+        
         <!-- Game mode played, such as words, sentences, or code -->
         <div class="result-card">
-          <span class="result-label">Mode</span>
-          <span id="final-mode" class="result-value">Words</span>
+            <span class="result-label">Mode</span>
+            <span id="final-mode" class="result-value">Words</span>
         </div>
 
+        <!-- Added difficulty to results screen -->
+        <div class="result-card">
+          <span class="result-label">Difficulty</span>
+          <span id="final-difficulty" class="result-value">Easy</span>
+        </div>
     </div>
 
     <!-- Reloads the page so the player can start again cleanly -->
@@ -164,9 +176,9 @@
 
   <!-- Link to JavaScript -->
   <!-- This connects the HTML to the JavaScript files. It is placed at the bottom so the HTML loads first, then JavaScript can find all the elements. -->
-  <!-- For screen switching -->
-  <script src="script.js"></script>
   <!-- For typing logic -->
   <script src="input.js"></script>
+  <!-- For screen switching -->
+  <script src="script.js"></script>
 </body>
 </html>

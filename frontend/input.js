@@ -198,7 +198,6 @@ function updateStatsDisplay() {
 
 // Updates the lives display using heart icons.
 // Only the remaining lives are shown as full hearts.
-// Used AI here!
 function updateLivesDisplay() {
   const fullHeart = "❤️";
 

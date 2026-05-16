@@ -29,9 +29,9 @@ const modeDescription = document.getElementById("mode-description");
 
 // Descriptions shown under the mode selector
 const modeDescriptions = {
-  words: "Practice with random words to build speed.",
-  sentences: "Type full sentences to practice flow and accuracy.",
-  code: "Practice typing short code snippets with symbols.",
+  words: "Practice with random words to build speed",
+  sentences: "Type full sentences to practice flow and accuracy",
+  code: "Practice typing short code snippets with symbols",
 };
 
 // Handles mode button clicks
@@ -82,7 +82,15 @@ function showScreen(screen) {
 
 // When Start Game is clicked -> switch to the game screen.
 // addEventListener waits for user action and respond to it.
+// Starts the game using the selected mode and difficulty from the menu.
 startBtn.addEventListener("click", function () {
+  // Send selected mode to input.js
+  mode = selectedMode;
+
+  // Start Person A's game logic with the selected difficulty
+  startGame(selectedDifficulty);
+
+  // Show the game screen
   showScreen(gameScreen);
 });
 
@@ -112,6 +120,7 @@ const finalScoreElement = document.getElementById("final-score");
 const personalBestElement = document.getElementById("personal-best");
 const finalModeElement = document.getElementById("final-mode");
 const newBestBadge = document.getElementById("new-best-badge");
+const finalDifficultyElement = document.getElementById("final-difficulty");
 
 // Stores the player's best WPM from the backend
 let personalBestWpm = 0;
@@ -154,6 +163,10 @@ function populateResultsScreen(sessionResult) {
   const finalAccuracy = sessionResult.accuracy;
   const finalScore = sessionResult.score;
   const finalMode = sessionResult.mode;
+  const finalDifficulty = sessionResult.difficulty;
+
+  // Displays difficulty on the results screen.
+  finalDifficultyElement.textContent = finalDifficulty;   
 
   // Check if this session beats the saved personal best
   const isNewBest = finalWpm > personalBestWpm;
