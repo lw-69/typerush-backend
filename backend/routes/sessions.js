@@ -32,7 +32,7 @@ router.post('/', async(req, res) => {
 // GET /sessions/best - return highest WPM
 router.get('/best', async(req, res) => {
     try {
-        const best = await Session.findOne().sort({ wpm: -1 });
+        const best = await Session.findOne().sort({ score: -1 });
 
         if (!best) {
             return res.status(404).json({ message: 'No sessions found yet' });
