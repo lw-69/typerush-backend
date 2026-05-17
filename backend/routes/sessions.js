@@ -10,7 +10,7 @@ const validModes = ['words', 'sentences', 'code'];
 // POST /sessions - save a completed session
 router.post('/', async(req, res) => {
     try {
-        const { wpm, accuracy, score, mode } = req.body; 
+        const { wpm, accuracy, score, mode, difficulty } = req.body; 
 
         if(!wpm || !accuracy || !score || !mode ) {
             return res.status(400).json({ error: 'Missing required fields: wpm, accuracy, score, mode'});
@@ -20,7 +20,7 @@ router.post('/', async(req, res) => {
             return res.status(400).json({ error: `Invalid mode. Must be one of: ${validModes.join(', ')}`});
         }
 
-        const session = new Session({ wpm, accuracy, score, mode });
+        const session = new Session({ wpm, accuracy, score, mode, difficulty });
         const savedSession = await session.save();
 
         res.status(201).json(savedSession);

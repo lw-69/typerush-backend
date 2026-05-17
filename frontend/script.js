@@ -138,8 +138,8 @@ const finalModeElement = document.getElementById("final-mode");
 const newBestBadge = document.getElementById("new-best-badge");
 const finalDifficultyElement = document.getElementById("final-difficulty");
 
-// Stores the player's best WPM from the backend
-let personalBestWpm = 0;
+// Stores the player's best score from the backend
+let personalBestScore = 0;
 
 // Loads the personal best from Person C's backend route.
 // Full route = /sessions + /best = /sessions/best
@@ -149,7 +149,7 @@ async function loadPersonalBest() {
 
     // 404 means no saved sessions exist yet, so personal best stays 0
     if (response.status === 404) {
-      personalBestWpm = 0;
+      personalBestScore = 0;
       personalBestElement.textContent = "0";
       return;
     }
@@ -162,10 +162,10 @@ async function loadPersonalBest() {
 
     const bestSession = await response.json();
 
-    // If backend returns a best session, display its WPM
-    if (bestSession && bestSession.wpm) {
-      personalBestWpm = bestSession.wpm;
-      personalBestElement.textContent = String(personalBestWpm);
+    // If backend returns a best session, display its score
+    if (bestSession && bestSession.score) {
+      personalBestScore = bestSession.score;
+      personalBestElement.textContent = String(personalBestScore);
     }
   } catch (error) {
     // Prevents the frontend from crashing if backend is not running
@@ -185,10 +185,10 @@ function populateResultsScreen(sessionResult) {
   finalDifficultyElement.textContent = finalDifficulty;   
 
   // Check if this session beats the saved personal best
-  const isNewBest = finalWpm > personalBestWpm;
+  const isNewBest = finalScore > personalBestScore;
 
   if (isNewBest) {
-    personalBestWpm = finalWpm;
+    personalBestScore = finalScore;
     newBestBadge.classList.remove("hidden");
   } else {
     newBestBadge.classList.add("hidden");
@@ -198,7 +198,7 @@ function populateResultsScreen(sessionResult) {
   finalWpmElement.textContent = String(finalWpm);
   finalAccuracyElement.textContent = Number(finalAccuracy).toFixed(1) + "%";
   finalScoreElement.textContent = String(finalScore);
-  personalBestElement.textContent = String(personalBestWpm);
+  personalBestElement.textContent = String(personalBestScore);
   finalModeElement.textContent = finalMode;
 }
 
